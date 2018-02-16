@@ -77,7 +77,11 @@ class ApiController extends Controller
         return $response;
     }
 
+    public function actionIsmaeltest()
+    {
+        $response = 5;
+        return $response;
+    }
 
 
-  
 }
