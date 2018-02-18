@@ -10,6 +10,8 @@ use yii\web\Response;
 use yii\filters\AccessControl;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBearerAuth;
+use frontend\models\SignupForm;
+use common\models\User;
 
 /**
  * Site controller
@@ -43,7 +45,7 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-        'except'=>['login']
+        'except'=>['login','signup']
             ];
 
         return $behaviors;
@@ -63,6 +65,21 @@ class ApiController extends Controller
                   ];
         } else {
             return ['Authentication' => false];
+        }
+    }
+
+
+    public function actionSignup()
+    {
+        $model = new SignupForm();
+        $request = Yii::$app->request;
+        $get = $request->get();
+        $model->attributes =Yii::$app->request->get();
+        if ($model->validate() && $model->signup()) {
+            return ['signup' => true,
+                  ];
+        } else {
+            return ['signup' => false];
         }
     }
 
