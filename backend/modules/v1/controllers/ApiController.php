@@ -76,11 +76,10 @@ class ApiController extends Controller
         $get = $request->get();
         $model->attributes =Yii::$app->request->get();
         if ($model->validate() && $model->signup()) {
-            $user = User::findByUsername($model->username);
-            return ['access_token' => $user->getAuthKey(),
+            return ['signup' => true,
                   ];
         } else {
-            return ['Authentication' => false];
+            return ['signup' => false];
         }
     }
 
