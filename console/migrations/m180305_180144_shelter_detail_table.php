@@ -22,20 +22,11 @@ class m180305_180144_shelter_detail_table extends Migration
           'last_updated' => $this->datetime()->notNull(),
           'available' => $this->boolean()->notNull(),
       ], $tableOptions);
-
-      // add foreign key for table `shelter_detail_table`
-            $this->addForeignKey(
-                'shelter_type_id',
-                'shelter_detail_table',
-                'shelter_type_id',
-                'type_table',
-                'CASCADE'
-            );
     }
 
     public function safedown()
     {
-        $this->dropTable('shelter_table');
+        $this->dropTable('shelter_detail_table');
     }
 
 }
