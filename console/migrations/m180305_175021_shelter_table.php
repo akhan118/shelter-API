@@ -18,6 +18,12 @@ class m180305_175021_shelter_table extends Migration
       $this->createTable('{{%shelter_table}}', [
           'shelter_id' => $this->primaryKey(),
           'shelter_name' => $this->string(10)->notNull(),
+          'shelter_address' => $this->string(30)->notNull(),
+          'shelter_phone' => $this->integer()->notNull(),
+          'shelter_county' => $this->string(10)->notNull(),
+          'shelter_email' => $this->string(10)->notNull(),
+          'shelter_EIN' => $this->integer()->notNull(),
+          'shelter_approved' => $this->smallInteger()->notNull()->defaultValue(0),
 
       ], $tableOptions);
     }
