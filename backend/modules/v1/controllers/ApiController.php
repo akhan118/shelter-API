@@ -125,5 +125,12 @@ class ApiController extends Controller
       return $response;
     }
 
+    public function actionSignupshelter()
+    {
+        $request = Yii::$app->request;
+        $get = $request->get();
+        return $get;
+    }
+
 
 }
