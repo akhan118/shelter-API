@@ -12,6 +12,7 @@ use yii\rest\Controller;
 use yii\filters\auth\HttpBearerAuth;
 use frontend\models\SignupForm;
 use common\models\User;
+use app\modules\v1\models\ShelterTable;
 
 
 /**
@@ -122,6 +123,13 @@ class ApiController extends Controller
       ->all();
 
       return $response;
+    }
+
+    public function actionSignupshelter()
+    {
+        $request = Yii::$app->request;
+        $get = $request->get();
+        return $get;
     }
 
 

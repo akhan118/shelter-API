@@ -68,21 +68,38 @@ class SiteController extends Controller
      *
      * @return string
      */
+    // public function actionLogin()
+    // {
+    //     if (!Yii::$app->user->isGuest) {
+    //         return $this->goHome();
+    //     }
+    //
+    //     $model = new LoginForm();
+    //     if ($model->load(Yii::$app->request->post()) && $model->login()) {
+    //         return $this->goBack();
+    //     } else {
+    //         return $this->render('login', [
+    //             'model' => $model,
+    //         ]);
+    //     }
+    // }
+
+
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+        $request = Yii::$app->request;
+        $get = $request->get();
+        $model->attributes =Yii::$app->request->get();
+        if ($model->validate() && $model->login()) {
+            return ['access_token' => Yii::$app->user->identity->getAuthKey(),
+                    'username' => Yii::$app->user->identity->username,
+                  ];
         } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
+            return ['Authentication' => false];
         }
     }
+    
 
     /**
      * Logout action.
