@@ -47,7 +47,7 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-        'except'=>['login','signup']
+        'except'=>['login','signup','getrequestedinfo']
             ];
 
         return $behaviors;
@@ -123,6 +123,49 @@ class ApiController extends Controller
       ->all();
 
       return $response;
+    }
+
+
+    public function actionGetrequestedinfo()
+     {
+
+        
+        $shelter_name='holy shelter';
+    // Pulls shelters from database that are family type    
+        $rows = (new \yii\db\Query())
+            ->select(['shelter_id'])
+            ->from('shelter_detail_table')
+            ->where(['shelter_type_id' => '7'])
+            ->all();
+
+         $shelter_type_id = [];
+
+
+        // puts all the selected shelters into an array for json file format
+
+            //  var_dump($rows);
+        for ($i = 0 ; $i < count ($rows) ; $i ++) {
+            array_push($shelter_type_id, $rows[$i]['shelter_id']);
+        }
+        // var_dump($shelter_type_id);
+
+        $sheltertable = ShelterTable::findAll($shelter_type_id);
+      //   var_dump($sheltertable);
+
+        
+    //   if ($rows) {
+    //         $shelterRows = (new \yii\db\Query())
+    //             ->select('*')
+    //             ->from('shelter_table')
+    //             ->where(['shelter_id' => $rows[0]['shelter_id']])
+    //             ->limit(10)
+    //             ->all();
+    //    }
+      //  $a = $sheltertable[1] => ["shelter_address"];
+// var_dump($a);
+
+// returns all shelters found for type
+          return $sheltertable; 
     }
 
     public function actionSignupshelter()
