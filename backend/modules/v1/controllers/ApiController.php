@@ -47,7 +47,7 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-        'except'=>['login','signup','getrequestedinfo']
+        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2']
             ];
 
         return $behaviors;
@@ -129,9 +129,9 @@ class ApiController extends Controller
     public function actionGetrequestedinfo()
      {
 
-        
+
         $shelter_name='holy shelter';
-    // Pulls shelters from database that are family type    
+    // Pulls shelters from database that are family type
         $rows = (new \yii\db\Query())
             ->select(['shelter_id'])
             ->from('shelter_detail_table')
@@ -152,7 +152,7 @@ class ApiController extends Controller
         $sheltertable = ShelterTable::findAll($shelter_type_id);
       //   var_dump($sheltertable);
 
-        
+
     //   if ($rows) {
     //         $shelterRows = (new \yii\db\Query())
     //             ->select('*')
@@ -165,7 +165,7 @@ class ApiController extends Controller
 // var_dump($a);
 
 // returns all shelters found for type
-          return $sheltertable; 
+          return $sheltertable;
     }
 
     public function actionSignupshelter()
@@ -174,6 +174,47 @@ class ApiController extends Controller
         $get = $request->get();
         return $get;
     }
+
+    public function actionGetrequestedinfov2()
+      {
+
+        //get shelter type (decide if it is a string or in )
+       $requestedShelterType = Yii::$app->request->get();
+
+        //$requestedShelterType = 1;
+
+        //grab all shelters that match the query type
+        $response1 = (new \yii\db\Query())
+        ->select('*')
+        ->from('shelter_detail_table')
+        ->where(['shelter_type_id' => $requestedShelterType])
+        ->all();
+
+
+        $returnedArray = [];
+
+        // puts all the selected shelter id into an array for json file format
+        for ($i = 0 ; $i < count ($response1) ; $i ++) {
+
+          //get desired fields from shelter_table from shelters matching type
+          //request
+          $response2 = (new \yii\db\Query())
+          ->select(['shelter_id',  'shelter_name', 'shelter_address',
+            'shelter_address_city', 'shelter_address_state', 'shelter_address_zip',
+            'shelter_phone', 'shelter_long', 'shelter_lat', 'shelter_county' ])
+          ->from('shelter_table')
+          ->where(['shelter_id' => $response1[$i]['shelter_id']])
+          ->all();
+
+          array_push($returnedArray, $response2[0] );
+          //add in fields from shelter_detail_table
+          $returnedArray[$i]['available'] = $response1[$i]['available'];
+          $returnedArray[$i]['last_updated'] = $response1[$i]['last_updated'];
+
+        }
+        return $returnedArray;
+      }
+
 
 
 }
