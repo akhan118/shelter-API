@@ -1,0 +1,14 @@
+{
+  "availability": [
+    {
+      "id": 0,
+      "personType": "woman",
+      "availability": false
+    },
+    {
+      "id": 1,
+      "personType": "youth",
+      "availability": true
+    }
+  ]
+}

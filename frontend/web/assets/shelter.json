@@ -1,0 +1,20 @@
+{
+  "id": 1,
+  "name": "Detroit Rescue Misson",
+  "EIN": 123456789,
+  "address": {
+    "street": "3535 3rd street",
+    "zip": 48201
+  },
+  "phoneNumber": 3139936703,
+  "personType": [
+    {
+      "id": 1,
+      "name": "woman"
+    },
+    {
+      "id": 2,
+      "name": "youth"
+    }
+  ]
+}
