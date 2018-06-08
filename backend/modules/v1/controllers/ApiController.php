@@ -181,15 +181,26 @@ class ApiController extends Controller
         //get shelter type (decide if it is a string or in )
        $requestedShelterType = Yii::$app->request->get();
 
-        //$requestedShelterType = 1;
+        if ($requestedShelterType['sheltertype'] == 5) {
+          //grab all shelters that match the query type
+          $response1 = (new \yii\db\Query())
+          ->select('*')
+          ->from('shelter_detail_table')
+          ->all();
 
-        //grab all shelters that match the query type
-        $response1 = (new \yii\db\Query())
+        }else {
+          $response1 = (new \yii\db\Query())
+          ->select('*')
+          ->from('shelter_detail_table')
+          ->where(['shelter_type_id' => $requestedShelterType])
+          ->all();
+        }
+
+        $sheltertypeString = (new \yii\db\Query())
         ->select('*')
-        ->from('shelter_detail_table')
-        ->where(['shelter_type_id' => $requestedShelterType])
+        ->from('type_table')
+        ->where(['shelter_type_id' => intval($requestedShelterType['sheltertype'])] )
         ->all();
-
 
         $returnedArray = [];
 
@@ -208,13 +219,14 @@ class ApiController extends Controller
 
           array_push($returnedArray, $response2[0] );
           //add in fields from shelter_detail_table
+          $returnedArray[$i]['shelter_type'] = [ "id" => $requestedShelterType['sheltertype'],
+                "type" => $sheltertypeString[0]['type_name']
+              ];
           $returnedArray[$i]['available'] = $response1[$i]['available'];
           $returnedArray[$i]['last_updated'] = $response1[$i]['last_updated'];
 
         }
         return $returnedArray;
       }
-
-
 
 }
