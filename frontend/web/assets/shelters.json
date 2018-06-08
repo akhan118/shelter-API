@@ -1,0 +1,94 @@
+[
+  {
+    "id": 1,
+    "name": "Detroit Rescue Misson",
+    "EIN": 123456789,
+    "address": {
+      "street": "3535 3rd street",
+      "zip": 48201
+    },
+    "phoneNumber": 3139936703,
+    "personType": [
+      {
+        "id": 1,
+        "name": "WOMAN"
+      },
+      {
+        "id": 2,
+        "name": "YOUTH"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Awesome Shelter",
+    "EIN": 2468101214,
+    "address": {
+      "street": "9999 Baltimore street",
+      "zip": 48202
+    },
+    "phoneNumber": 3139936703,
+    "personType": [
+      {
+        "id": 1,
+        "name": "WOMAN"
+      },
+      {
+        "id": 2,
+        "name": "YOUTH"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Michigan Misson",
+    "EIN": 123456009,
+    "address": {
+      "street": "Michigan Ave",
+      "zip": 48223
+    },
+    "phoneNumber": 3132446703,
+    "personType": [
+      {
+        "id": 3,
+        "name": "MEN"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Family Matters",
+    "EIN": 123458642,
+    "address": {
+      "street": "Peterboro Ave",
+      "zip": 48201
+    },
+    "phoneNumber": 3134956703,
+    "personType": [
+      {
+        "id": 2,
+        "name": "WOMEN"
+      },
+      {
+        "id": 1,
+        "name": "MEN"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "The Kids",
+    "EIN": 123458642,
+    "address": {
+      "street": "Peterboro Ave",
+      "zip": 48201
+    },
+    "phoneNumber": 3134956703,
+    "personType": [
+      {
+        "id": 2,
+        "name": "YOUTH"
+      }
+    ]
+  }
+]
