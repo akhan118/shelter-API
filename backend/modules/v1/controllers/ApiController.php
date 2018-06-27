@@ -172,6 +172,24 @@ class ApiController extends Controller
     {
         $request = Yii::$app->request;
         $get = $request->get();
+        $shelterName= "ShelterName";
+        $shelterAddress ="address";
+        // $username="username";
+        // $email="test@yahoo.com";
+        // $password="password";
+        $SignUpFlag= $this->actionSignup();
+        if($SignUpFlag === true )
+        {
+
+          ///then go ahead and save shelter information inside shelter table.
+        }else{
+          return ['message' => $SignUpFlag,
+                ];
+        }
+
+
+
+
         return $get;
     }
 
