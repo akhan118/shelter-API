@@ -47,7 +47,7 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2']
+        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2', 'signupshelter']
             ];
 
         return $behaviors;
@@ -75,12 +75,15 @@ class ApiController extends Controller
     {
         $model = new SignupForm();
         $request = Yii::$app->request;
+        
         $get = $request->get();
+        // var_dump($get);
         $model->attributes = Yii::$app->request->get();
         if ($model->validate() && $model->signup()) {
-            return ['signup' => true,
-                  ];
+
+            return ['signup' => true];
         } else {
+            
             return ['signup' => false];
         }
     }
@@ -168,30 +171,78 @@ class ApiController extends Controller
           return $sheltertable;
     }
 
+//This functions is used to update information for the shelter
+    // public function actionUpdateshelter()
+    // {}
+
+//function to add new shelters to db
     public function actionSignupshelter()
     {
         $request = Yii::$app->request;
         $get = $request->get();
-        $shelterName= "ShelterName";
-        $shelterAddress ="address";
-        // $username="username";
-        // $email="test@yahoo.com";
-        // $password="password";
-        $SignUpFlag= $this->actionSignup();
-        if($SignUpFlag === true )
-        {
+        $newShelterinfo = Yii::$app->request->get();
 
-          ///then go ahead and save shelter information inside shelter table.
-        }else{
-          return ['message' => $SignUpFlag,
-                ];
+        // var_dump($newShelterinfo);
+//    var_dump($this->actionSignup());
+ // this section is to make sure all information is being received to enter into db               
+ //  
+  if (isset($newShelterinfo['shelter_name'])
+     && isset($newShelterinfo['shelter_address'])
+     && isset($newShelterinfo['shelter_address_city'])
+     && isset($newShelterinfo['shelter_address_state'])
+     && isset($newShelterinfo['shelter_address_zip'])
+     && isset($newShelterinfo['shelter_phone'])
+     && isset($newShelterinfo['shelter_EIN'])
+     && isset ($newShelterinfo['shelter_email']))
+     
+    //  && isset($newShelterinfo['shelter_user_id']))
+
+
+       {
+        // var_dump($newShelterinfo);
+        $signup= $this->actionSignup();
+        //   var_dump($signup['signup']);
+            //   var_dump($signup);    
+    //    if ($signup['signup'] != false) {
+            Yii::$app->db->createCommand()->insert('shelter_table', [
+            
+                'shelter_name' => $newShelterinfo['shelter_name'],
+                'shelter_address' => $newShelterinfo['shelter_address'],
+                'shelter_address_city' => $newShelterinfo['shelter_address_city'],
+                'shelter_address_state' => $newShelterinfo['shelter_address_state'],
+                'shelter_address_zip' => $newShelterinfo['shelter_address_zip'],
+                'shelter_county' => $newShelterinfo['shelter_county'],
+                 'shelter_phone' => $newShelterinfo['shelter_phone'],
+                 'shelter_EIN' => $newShelterinfo['shelter_EIN'],
+                 'shelter_email' => $newShelterinfo['shelter_email'],
+                //  'shelter_user_id' => $newShelterinfo['shelter_user_id'],
+                
+                
+
+            ])->execute();
+            
+           return $newShelterinfo;
+        //    else{
+        // }
+        //     return("Can't create user");
+        // $SignUpFlag= $this->actionSignup();
+        // if($SignUpFlag === true )
+        // {
+
+        //   ///then go ahead and save shelter information inside shelter table.
+        // }else{
+            // return ['message' => $SignUpFlag,];
+      
         }
 
-
-
-
-        return $get;
-    }
+      else
+        {
+        // var_dump($newShelterinfo);
+        $error = 'Incomplete Input';
+         return $error;
+        }
+     }
+    
 
     public function actionGetrequestedinfov2()
       {
