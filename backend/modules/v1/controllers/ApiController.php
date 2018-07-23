@@ -47,7 +47,7 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2', 'signupshelter']
+        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2', 'signupshelter', 'shelterconfig']
             ];
 
         return $behaviors;
@@ -193,8 +193,8 @@ class ApiController extends Controller
      && isset($newShelterinfo['shelter_address_zip'])
      && isset($newShelterinfo['shelter_phone'])
      && isset($newShelterinfo['shelter_EIN'])
-     && isset ($newShelterinfo['shelter_email']))
-     
+     && isset ($newShelterinfo['shelter_email'])
+     && isset($newShelterinfo['username']))
     //  && isset($newShelterinfo['shelter_user_id']))
 
 
@@ -215,24 +215,14 @@ class ApiController extends Controller
                  'shelter_phone' => $newShelterinfo['shelter_phone'],
                  'shelter_EIN' => $newShelterinfo['shelter_EIN'],
                  'shelter_email' => $newShelterinfo['shelter_email'],
-                //  'shelter_user_id' => $newShelterinfo['shelter_user_id'],
+                  'shelter_user_id' => $newShelterinfo['username'],
                 
                 
 
             ])->execute();
             
            return $newShelterinfo;
-        //    else{
-        // }
-        //     return("Can't create user");
-        // $SignUpFlag= $this->actionSignup();
-        // if($SignUpFlag === true )
-        // {
-
-        //   ///then go ahead and save shelter information inside shelter table.
-        // }else{
-            // return ['message' => $SignUpFlag,];
-      
+        
         }
 
       else
@@ -243,6 +233,113 @@ class ApiController extends Controller
         }
      }
     
+    public function actionShelterconfig(){
+
+        $request = Yii::$app->request;
+        $get = $request->get();
+        $newShelteravailable = Yii::$app->request->get();
+        // var_dump($newShelteravailable);
+        date_default_timezone_set('america/detroit');
+        $date = date('Y-m-d h:i:s a', time());
+
+        if (isset($newShelteravailable['shelter_name'])
+            && isset($newShelteravailable['shelter_type1'])  
+            && isset($newShelteravailable['available1'])
+            && isset($newShelteravailable['shelter_type2'])
+            && isset($newShelteravailable['available2'])
+            && isset($newShelteravailable['shelter_type3'])
+            && isset($newShelteravailable['available3'])
+            && isset($newShelteravailable['shelter_type4'])
+            && isset($newShelteravailable['available4']))
+             {
+            
+
+// Get individual variable information out of $get and make sure not blank
+// items to get are  shelter_name, men, women, family, youth and if available or not
+
+// find shelter_id from shelter_table for shelter named
+
+        //  var_dump($newShelteravailable['shelter_name']);
+        $shelteridString = (new \yii\db\Query())
+            ->select('shelter_id')
+            ->from('shelter_table')
+            ->where(['shelter_name' => $newShelteravailable['shelter_name']])
+            ->all();
+$newshelter_id = $shelteridString[0]['shelter_id'];
+$newnumber = $newshelter_id;
+var_dump($newnumber);
+        var_Dump($newshelter_id);
+
+// Check to see if shelter_id exists before adding to database
+
+        $sheltertypeString = (new \yii\db\Query())
+            ->select('*')
+            ->from('shelter_detail_table')
+            ->where(['shelter_id' => $newshelter_id])
+            ->all();
+
+// var_dump($sheltertypeString);
+// var_dump(count($sheltertypeString));
+// var_dump ($newshelter_id);
+         if (count($sheltertypeString) <1) {
+            // shelter doesn't exist in detail database 
+           $alreadythere='Not there'; 
+           var_dump ($alreadythere);
+//         
+//  Add bed availability to database
+
+        Yii::$app->db->createCommand()->insert('shelter_detail_table', [
+
+            'shelter_id' => $newshelter_id,
+            'shelter_type_id' => $newShelteravailable['shelter_type1'],
+            'available' => $newShelteravailable['available1'],
+             'last_updated' => $date,
+        ])->execute();
+
+        $message='added 1st one';
+         var_dump ($message);
+        
+         Yii::$app->db->createCommand()->insert('shelter_detail_table', [
+
+            'shelter_id' => $newshelter_id,
+            'shelter_type_id' => $newShelteravailable['shelter_type2'],
+            'available' => $newShelteravailable['available2'],
+            'last_updated' => $date,
+        ])->execute();
+
+         Yii::$app->db->createCommand()->insert('shelter_detail_table', [
+
+            'shelter_id' => $newshelter_id,
+            'shelter_type_id' => $newShelteravailable['shelter_type3'],
+            'available' => $newShelteravailable['available3'],
+            'last_updated' => $date,
+        ])->execute();
+
+         Yii::$app->db->createCommand()->insert('shelter_detail_table', [
+
+            'shelter_id' => $newshelter_id,
+            'shelter_type_id' => $newShelteravailable['shelter_type4'],
+            'available' => $newShelteravailable['available4'],
+            'last_updated' => $date,
+        ])->execute();
+
+        $message='should be added';
+        var_dump ($message);
+     }else{
+    //    shelter already exist and just update info
+
+            $alreadythere = 'Already there. Should update instead of add';
+            return $alreadythere;
+            
+     } 
+     } else {
+
+            $baddata = 'Missing Shelter Data';
+            return $baddata;
+        }
+}
+
+
 
     public function actionGetrequestedinfov2()
       {

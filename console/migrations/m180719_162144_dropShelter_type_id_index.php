@@ -3,17 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Class m180629_005328_username_fk
+ * Class m180719_162144_dropShelter_type_id_index
  */
-class m180629_005328_username_fk extends Migration
+class m180719_162144_dropShelter_type_id_index extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-    //         public
-    //  void addForeignKey ( $name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null )
+                $this->dropIndex('shelter_id', 'shelter_detail_table');
     }
 
     /**
@@ -21,7 +20,7 @@ class m180629_005328_username_fk extends Migration
      */
     public function safeDown()
     {
-        echo "m180629_005328_username_fk cannot be reverted.\n";
+        echo "m180719_162144_dropShelter_type_id_index cannot be reverted.\n";
 
         return false;
     }
@@ -35,9 +34,9 @@ class m180629_005328_username_fk extends Migration
 
     public function down()
     {
-        echo "m180629_005328_username_fk cannot be reverted.\n";
+        echo "m180719_162144_dropShelter_type_id_index cannot be reverted.\n";
 
         return false;
     }
-     */
+    */
 }
