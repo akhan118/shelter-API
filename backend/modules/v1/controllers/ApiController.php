@@ -75,7 +75,7 @@ class ApiController extends Controller
     {
         $model = new SignupForm();
         $request = Yii::$app->request;
-        
+
         $get = $request->get();
         // var_dump($get);
         $model->attributes = Yii::$app->request->get();
@@ -83,7 +83,7 @@ class ApiController extends Controller
 
             return ['signup' => true];
         } else {
-            
+
             return ['signup' => false];
         }
     }
@@ -184,8 +184,8 @@ class ApiController extends Controller
 
         // var_dump($newShelterinfo);
 //    var_dump($this->actionSignup());
- // this section is to make sure all information is being received to enter into db               
- //  
+ // this section is to make sure all information is being received to enter into db
+ //
   if (isset($newShelterinfo['shelter_name'])
      && isset($newShelterinfo['shelter_address'])
      && isset($newShelterinfo['shelter_address_city'])
@@ -202,10 +202,10 @@ class ApiController extends Controller
         // var_dump($newShelterinfo);
         $signup= $this->actionSignup();
         //   var_dump($signup['signup']);
-            //   var_dump($signup);    
+            //   var_dump($signup);
     //    if ($signup['signup'] != false) {
             Yii::$app->db->createCommand()->insert('shelter_table', [
-            
+
                 'shelter_name' => $newShelterinfo['shelter_name'],
                 'shelter_address' => $newShelterinfo['shelter_address'],
                 'shelter_address_city' => $newShelterinfo['shelter_address_city'],
@@ -216,13 +216,13 @@ class ApiController extends Controller
                  'shelter_EIN' => $newShelterinfo['shelter_EIN'],
                  'shelter_email' => $newShelterinfo['shelter_email'],
                   'shelter_user_id' => $newShelterinfo['username'],
-                
-                
+
+
 
             ])->execute();
-            
+
            return $newShelterinfo;
-        
+
         }
 
       else
@@ -232,7 +232,7 @@ class ApiController extends Controller
          return $error;
         }
      }
-    
+
     public function actionShelterconfig(){
 
         $request = Yii::$app->request;
@@ -243,7 +243,7 @@ class ApiController extends Controller
         $date = date('Y-m-d h:i:s a', time());
 
         if (isset($newShelteravailable['shelter_name'])
-            && isset($newShelteravailable['shelter_type1'])  
+            && isset($newShelteravailable['shelter_type1'])
             && isset($newShelteravailable['available1'])
             && isset($newShelteravailable['shelter_type2'])
             && isset($newShelteravailable['available2'])
@@ -252,7 +252,7 @@ class ApiController extends Controller
             && isset($newShelteravailable['shelter_type4'])
             && isset($newShelteravailable['available4']))
              {
-            
+
 
 // Get individual variable information out of $get and make sure not blank
 // items to get are  shelter_name, men, women, family, youth and if available or not
@@ -282,10 +282,10 @@ var_dump($newnumber);
 // var_dump(count($sheltertypeString));
 // var_dump ($newshelter_id);
          if (count($sheltertypeString) <1) {
-            // shelter doesn't exist in detail database 
-           $alreadythere='Not there'; 
+            // shelter doesn't exist in detail database
+           $alreadythere='Not there';
            var_dump ($alreadythere);
-//         
+//
 //  Add bed availability to database
 
         Yii::$app->db->createCommand()->insert('shelter_detail_table', [
@@ -298,7 +298,7 @@ var_dump($newnumber);
 
         $message='added 1st one';
          var_dump ($message);
-        
+
          Yii::$app->db->createCommand()->insert('shelter_detail_table', [
 
             'shelter_id' => $newshelter_id,
@@ -330,8 +330,8 @@ var_dump($newnumber);
 
             $alreadythere = 'Already there. Should update instead of add';
             return $alreadythere;
-            
-     } 
+
+     }
      } else {
 
             $baddata = 'Missing Shelter Data';
