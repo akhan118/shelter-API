@@ -92,11 +92,18 @@ class ApiController extends Controller
 
     public function actionYellow()
     {
+        // give access only for superAdmin
+        if (\Yii::$app->user->can('actionYellow')) {
+            
         $response = [
             'username' => Yii::$app->user->identity->username,
             'access_token' => Yii::$app->user->identity->getAuthKey(),
         ];
         return $response;
+    } else {
+        throw new ForbiddenHttpException('You are not allowed to do yellow.');
+    }
+
     }
 
     public function actionIsmaeltest()
