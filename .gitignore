@@ -35,4 +35,7 @@ phpunit.phar
 # vagrant runtime
 /.vagrant
 
+#data localhost step
+/main-local.php
+
 .htaccess
