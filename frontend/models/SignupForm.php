@@ -54,6 +54,16 @@ class SignupForm extends Model
         $user->setPassword($this->password);
         $user->generateAuthKey();
         
-        return $user->save() ? $user : null;
+        if ($user->save()) {
+
+            // the following three lines were added:
+            $auth = \Yii::$app->authManager;
+            $userRole = $auth->getRole('shelterAdmin'); // sing the role user,shelterAmin or superAdmin
+            $auth->assign($userRole, $user->getId());
+
+            return $user;
+        }
+
+        return null;
     }
 }
