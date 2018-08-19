@@ -98,11 +98,22 @@ class ApiController extends Controller
 
     public function actionYellow()
     {
+        //this use if want shelter admin upadate his own post only
+        //if (\Yii::$app->user->can('updatePost', ['model' => $post])) {
+            // update post
+          //  }
+          
+          // give access only for superAdmin
+          if (\Yii::$app->user->can('updatePost', ['model' => $post])) {
+            // update post
+            }
+          if (\Yii::$app->user->can('actionYellow')) {
         $response = [
             'username' => Yii::$app->user->identity->username,
             'access_token' => Yii::$app->user->identity->getAuthKey(),
         ];
         return $response;
+         }
     }
 
     public function actionIsmaeltest()
