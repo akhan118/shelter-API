@@ -12,7 +12,10 @@ class m180811_210540_drop_shelter_detail_table extends Migration
      */
     public function safeUp()
     {
-        $this->dropTable('shelter_detail_table');
+        if ($this->db->schema->getTableSchema('shelter_detail_table', true) != null) {
+            $this->dropTable('shelter_detail_table');
+            // table 'my_table' exists!
+        }
     }
 
     /**
@@ -22,7 +25,7 @@ class m180811_210540_drop_shelter_detail_table extends Migration
     {
         $this->createTable('shelter_detail_table', [
             'shelter_detail_id' => $this->primaryKey(),
-           
+
         ]);
     }
 }

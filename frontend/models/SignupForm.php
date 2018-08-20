@@ -44,21 +44,20 @@ class SignupForm extends Model
     public function signup()
     {
         if (!$this->validate()) {
-           
+
             return null;
         }
-        
+
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;
         $user->setPassword($this->password);
         $user->generateAuthKey();
-        
-        if ($user->save()) {
 
+        if ($user->save()) {
             // the following three lines were added:
             $auth = \Yii::$app->authManager;
-            $userRole = $auth->getRole('shelterAdmin'); // sing the role user,shelterAmin or superAdmin
+            $userRole = $auth->getRole('admin'); // sign the role to user,shelterAmin or superAdmin
             $auth->assign($userRole, $user->getId());
 
             return $user;

@@ -70,8 +70,11 @@ class ApiController extends Controller
         $get = $request->get();
         $model->attributes =Yii::$app->request->get();
         if ($model->validate() && $model->login()) {
+            $userId= Yii::$app->user->identity->id;
             return ['access_token' => Yii::$app->user->identity->getAuthKey(),
                     'username' => Yii::$app->user->identity->username,
+                    'role' => \Yii::$app->authManager->getRolesByUser($userId),
+
                   ];
         } else {
             return ['Authentication' => false];
@@ -98,22 +101,19 @@ class ApiController extends Controller
 
     public function actionYellow()
     {
-        //this use if want shelter admin upadate his own post only
-        //if (\Yii::$app->user->can('updatePost', ['model' => $post])) {
-            // update post
-          //  }
-          
-          // give access only for superAdmin
-          if (\Yii::$app->user->can('updatePost', ['model' => $post])) {
-            // update post
-            }
-          if (\Yii::$app->user->can('actionYellow')) {
-        $response = [
-            'username' => Yii::$app->user->identity->username,
-            'access_token' => Yii::$app->user->identity->getAuthKey(),
-        ];
-        return $response;
-         }
+        $userId= Yii::$app->user->identity->id;
+        if (\Yii::$app->user->can('viewAdmin')) {
+            return   $response = [
+                'username' => Yii::$app->user->identity->username,
+                'access_token' => Yii::$app->user->identity->getAuthKey(),
+                'role' => \Yii::$app->authManager->getRolesByUser($userId),
+
+            ];
+        } else {
+            return   $response = [
+                      'username' => 'Does not have the correct role to view',
+                  ];
+        }
     }
 
     public function actionIsmaeltest()

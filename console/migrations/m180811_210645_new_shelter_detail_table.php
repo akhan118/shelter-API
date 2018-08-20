@@ -25,6 +25,8 @@ class m180811_210645_new_shelter_detail_table extends Migration
           'last_updated' => $this->datetime()->notNull(),
           'available' => $this->boolean()->notNull(),
       ], $tableOptions);
+
+      
     }
 
     /**
