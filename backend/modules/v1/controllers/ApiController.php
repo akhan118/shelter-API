@@ -266,10 +266,12 @@ class ApiController extends Controller
                 ->where(['shelter_id' => $newShelterinfo['shelter_id']])
                 ->all();
 
-            
-            $newshelter_name = $shelteridString[0]['shelter_name'];
+                  $newshelter_name='';
+                  if (count($shelteridString) > 0 ) {
+                    $newshelter_name = $shelteridString[0]['shelter_name'];
+                    }
                     // $newshelter_address = $shelteridString[0]['shelter_address'];
-                  
+
 
 // Check to see if shelter_id exists before adding to database
 
@@ -282,7 +284,7 @@ class ApiController extends Controller
 
             if (count($sheltertypeString) < 1) {
             // shelter doesn't exist in detail database
-                    
+
 //
 //  Add bed availability to database
 // Insert Women and if available
@@ -317,7 +319,7 @@ class ApiController extends Controller
                 } else {
 
                     $sheltertheremessage = 'The Shelter was not in the database.  Please Signup';
-                    return sheltertheremessage;
+                    return $sheltertheremessage;
                 }
             } else {
     //    shelter already exist and just update info
@@ -337,7 +339,7 @@ class ApiController extends Controller
 
 
 
-        
+
 
 
 
@@ -376,8 +378,8 @@ class ApiController extends Controller
 
             if (count($sheltertypeString) < 1) {
 
-                
-// Insert Women and if available because not entered before     
+
+// Insert Women and if available because not entered before
 
                 Yii::$app->db->createCommand()->insert('shelter_detail_table', [
 
@@ -385,8 +387,8 @@ class ApiController extends Controller
                     'shelter_type_id' => $newShelteravailable['women'],
                     'available' => $newShelteravailable['womenavailable'],
                     'last_updated' => $date,
-                ])->execute();  
-              
+                ])->execute();
+
 
 // Insert Men and if available
 
@@ -419,15 +421,15 @@ class ApiController extends Controller
 
             } else {
 
-               
+
 // Update the men, women, youth and family availability
 
                 $sheltertoupdate = ShelterDetailTable::findAll(['shelter_id' => $newShelteravailable['shelter_id']]);
-               
+
                 $sheltersearch = $newShelteravailable['shelter_id'];
-                
+
                 if (count($sheltertoupdate) > 0) {
-               
+
                     $sheltertoupdate[0]->shelter_type_id = $newShelteravailable['women'];
                     $sheltertoupdate[0]->available = $newShelteravailable['womenavailable'];
                     $sheltertoupdate[0]->last_updated = $date;
