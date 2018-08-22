@@ -188,7 +188,16 @@ class ApiController extends Controller
     // public function actionUpdateshelter()
     // {}
 
-//function to add new shelters to db
+
+
+    /**
+     * Action SignUpShelter
+     * Add a new shelter
+     * Author: Annette & Ahmad .
+     * paramters: shelter_name , email, username .
+     * return : new shelter id or error.
+     * @return string
+     */
     public function actionSignupshelter()
     {
         $request = Yii::$app->request;
@@ -227,8 +236,16 @@ class ApiController extends Controller
 
 
 
-    //  This function will add the initial information for types of rooms available for the shelter when they first register their shelter
 
+        /**
+         * Action ShelterConfig
+         * This function will add the initial information for types of rooms-
+         * available for the shelter when they first register their shelter
+         * Author: Annette
+         * paramters: ..........?
+         * return : ...........?
+         * @return string
+         */
         public function actionShelterconfig()
         {
         $request = Yii::$app->request;
