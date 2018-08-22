@@ -3,8 +3,8 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            // 'dsn' => 'mysql:host=localhost;dbname=homeless_project',
-            'dsn' => 'mysql:host=localhost;dbname=homeless_project2',
+             'dsn' => 'mysql:host=localhost;dbname=homeless_project',
+            //'dsn' => 'mysql:host=localhost;dbname=homeless_project2',
             'username' => 'root',
             'password' => 'root',
             'charset' => 'utf8',
@@ -16,6 +16,11 @@ return [
             // 'useFileTransport' to false and configure a transport
             // for the mailer to send real emails.
             'useFileTransport' => true,
+        ],
+          //add Authorization Manager
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+            // 'defaultRoles' => ['superAdmin','shelterAdmin','user']
         ],
     ],
 ];
