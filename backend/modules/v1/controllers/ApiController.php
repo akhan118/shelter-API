@@ -71,11 +71,20 @@ class ApiController extends Controller
         $model->attributes =Yii::$app->request->get();
         if ($model->validate() && $model->login()) {
             $userId= Yii::$app->user->identity->id;
-            return ['access_token' => Yii::$app->user->identity->getAuthKey(),
-                    'username' => Yii::$app->user->identity->username,
-                    'role' => \Yii::$app->authManager->getRolesByUser($userId),
 
-                  ];
+
+            $shelter = (new \yii\db\Query())
+                            ->select('*')
+                            ->from('shelter_table')
+                            ->where(['userId' => $userId])
+                            ->all();
+                            var_dump($shelter);
+            //
+            // return ['access_token' => Yii::$app->user->identity->getAuthKey(),
+            //         'username' => Yii::$app->user->identity->username,
+            //         'role' => \Yii::$app->authManager->getRolesByUser($userId),
+            //         'shelter'=> $shelter,
+            //       ];
         } else {
             return ['Authentication' => false];
         }
@@ -91,7 +100,9 @@ class ApiController extends Controller
         // var_dump($get);
         $model->attributes = Yii::$app->request->get();
         if ($model->validate() && $model->signup()) {
-            return ['signup' => true];
+            return ['signup' => true,
+                    'userId' => Yii::$app->db->getLastInsertID(),
+                    ];
         } else {
             return ['signup' => false,'error'=>$model->getErrors()];
         }
@@ -207,30 +218,31 @@ class ApiController extends Controller
             && isset($newShelterinfo['email'])
             && isset($newShelterinfo['username'])) {
             $signup= $this->actionSignup();
+
             if ($signup['signup'] != false) {
+                $userId= $signup['userId'];
                 Yii::$app->db->createCommand()->insert('shelter_table', [
                 'shelter_name' => $newShelterinfo['shelter_name'],
                 'shelter_email' => $newShelterinfo['email'],
                 'username' => $newShelterinfo['username'],
+                'userID' => $userId,
+
             ])->execute();
-                $response = [
+                return   $response = [
                 'status' => 'success',
                 'new_shelter_id' => Yii::$app->db->getLastInsertID(),
             ];
-                return $response;
             } else {
-                $response = [
+                return       $response = [
                'signup' =>'failed',
                'error' => $signup['error']
            ];
-                return $response;
             }
         } else {
-            $response = [
+            return     $response = [
               'incomplete input ' =>'failed',
               'error' => $newShelterinfo,
           ];
-            return $response;
         }
     }
 
@@ -248,12 +260,12 @@ class ApiController extends Controller
          */
         public function actionShelterconfig()
         {
-        $request = Yii::$app->request;
-        $get = $request->get();
-        $newShelteravailable = Yii::$app->request->get();
+            $request = Yii::$app->request;
+            $get = $request->get();
+            $newShelteravailable = Yii::$app->request->get();
         // var_dump($newShelteravailable);
         date_default_timezone_set('america/detroit');
-        $date = date('Y-m-d h:i:s a', time());
+            $date = date('Y-m-d h:i:s a', time());
 
         // Get individual variable information out of $get and make sure not blank
        // items to get are  shelter_name, men, women, family, youth and if available or not
@@ -283,10 +295,10 @@ class ApiController extends Controller
                 ->where(['shelter_id' => $newShelterinfo['shelter_id']])
                 ->all();
 
-                  $newshelter_name='';
-                  if (count($shelteridString) > 0 ) {
-                    $newshelter_name = $shelteridString[0]['shelter_name'];
-                    }
+            $newshelter_name='';
+            if (count($shelteridString) > 0) {
+                $newshelter_name = $shelteridString[0]['shelter_name'];
+            }
                     // $newshelter_address = $shelteridString[0]['shelter_address'];
 
 
@@ -300,7 +312,7 @@ class ApiController extends Controller
 
 
             if (count($sheltertypeString) < 1) {
-            // shelter doesn't exist in detail database
+                // shelter doesn't exist in detail database
 
 //
 //  Add bed availability to database
@@ -312,10 +324,7 @@ class ApiController extends Controller
                 $sheltersearch = $newShelterinfo['shelter_id'];
 
                 if (count($sheltertoupdate) > 0) {
-
-
                     if ($shelteridString[0]['shelter_address'] == null) {
-
                         $sheltertoupdate[0]->shelter_address = $newShelterinfo['shelter_address'];
                         $sheltertoupdate[0]->shelter_address_city = $newShelterinfo['shelter_address_city'];
                         $sheltertoupdate[0]->shelter_address_state = $newShelterinfo['shelter_address_state'];
@@ -328,31 +337,24 @@ class ApiController extends Controller
                         $addmessage = ['Shelter information has been updated in the database', $sheltertoupdate[0]];
                         return $addmessage;
                     } else {
-
                         $alreadythere = 'Shelter Information is already there. Should update instead of adding as new shelter';
                         return $alreadythere;
                     }
-
                 } else {
-
                     $sheltertheremessage = 'The Shelter was not in the database.  Please Signup';
                     return $sheltertheremessage;
                 }
             } else {
-    //    shelter already exist and just update info
+                //    shelter already exist and just update info
 
                 $alreadythere = 'Already there. Should update instead of adding as new shelter';
                 return $alreadythere;
-
             }
-
-
         } else {
-
             $baddata = ['Missing Shelter Data', $newShelterinfo];
             return $baddata;
         }
-    }
+        }
 
 
 
@@ -364,12 +366,12 @@ class ApiController extends Controller
 //  This function is to update the availability of the shelters
  public function actionShelterupdateconfig()
  {
-        $request = Yii::$app->request;
-        $get = $request->get();
-        $newShelteravailable = Yii::$app->request->get();
+     $request = Yii::$app->request;
+     $get = $request->get();
+     $newShelteravailable = Yii::$app->request->get();
         // var_dump($newShelteravailable);
         date_default_timezone_set('america/detroit');
-        $date = date('Y-m-d h:i:s a', time());
+     $date = date('Y-m-d h:i:s a', time());
 
 // // Get individual variable information out of $get and make sure not blank
 // // items to get are  shelter_name, men, women, family, youth and if available or not
@@ -383,9 +385,6 @@ class ApiController extends Controller
             && isset($newShelteravailable['youthavailable'])
             && isset($newShelteravailable['family'])
             && isset($newShelteravailable['familyavailable'])) {
-
-
-
             $sheltertypeString = (new \yii\db\Query())
                 ->select('*')
                 ->from('shelter_detail_table')
@@ -435,7 +434,6 @@ class ApiController extends Controller
 
                 $message = ['Availability has been added', $sheltertypeString];
                 return $message;
-
             } else {
 
 
@@ -446,7 +444,6 @@ class ApiController extends Controller
                 $sheltersearch = $newShelteravailable['shelter_id'];
 
                 if (count($sheltertoupdate) > 0) {
-
                     $sheltertoupdate[0]->shelter_type_id = $newShelteravailable['women'];
                     $sheltertoupdate[0]->available = $newShelteravailable['womenavailable'];
                     $sheltertoupdate[0]->last_updated = $date;
@@ -470,13 +467,11 @@ class ApiController extends Controller
                     $message = ['Availability has been updated', $sheltertoupdate];
                     return $message;
                 }
-
             }
-
         } else {
             $missingdata = ['Missing data', $newShelteravailable];
         }
-    }
+ }
 
 
 
