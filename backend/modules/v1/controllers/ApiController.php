@@ -80,11 +80,11 @@ class ApiController extends Controller
                             ->all();
                             var_dump($shelter);
             //
-            // return ['access_token' => Yii::$app->user->identity->getAuthKey(),
-            //         'username' => Yii::$app->user->identity->username,
-            //         'role' => \Yii::$app->authManager->getRolesByUser($userId),
-            //         'shelter'=> $shelter,
-            //       ];
+            return ['access_token' => Yii::$app->user->identity->getAuthKey(),
+                    'username' => Yii::$app->user->identity->username,
+                    'role' => \Yii::$app->authManager->getRolesByUser($userId),
+                    'shelter'=> $shelter,
+                  ];
         } else {
             return ['Authentication' => false];
         }
