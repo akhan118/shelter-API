@@ -595,7 +595,7 @@ class ApiController extends Controller
             // ->where(['shelter_id' => $response1[$i]['shelter_id']])
             ->where(['shelter_approved' => 1])
             ->all();
-    
+// var_Dump($response2);
 
          $returnedArray = [];
 
