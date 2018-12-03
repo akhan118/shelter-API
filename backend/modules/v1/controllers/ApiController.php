@@ -55,7 +55,7 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2', 'getallsheltersneedactivation','signupshelter', 'shelterconfig', 'shelterupdateconfig']
+        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2', 'getallsheltersneedactivation','signupshelter', 'shelterconfig', 'shelterupdateconfig', 'updateshelterapprovalupdate']
         ];
 
         return $behaviors;
@@ -215,11 +215,6 @@ class ApiController extends Controller
 // returns all shelters found for type
           return $sheltertable;
     }
-
-//This functions is used to update information for the shelter
-    // public function actionUpdateshelter()
-    // {}
-
 
 
     /**
@@ -527,6 +522,50 @@ class ApiController extends Controller
             return $response;
         }
     }
+
+
+    /**
+     * Action Updateshelterapprovalupdate
+     * This function will available shelters in the database to the Users searching for shelter.  
+     * Author: Annette
+     * paramters: Type of shelter searching (Women, Men, Youth or Family)for or 5 for all shelters
+     * return : List of shelter matching search type
+     * @return string
+     */
+
+    public function actionUpdateshelterapprovalupdate(){
+
+
+        $request = Yii::$app->request;
+        $get = $request->get();
+        $newShelterinfo = Yii::$app->request->get();
+
+        $sheltertoupdate = ShelterTable::findAll(['shelter_id' => $newShelterinfo['shelter_id']]);
+
+        $sheltersearch = $newShelterinfo['shelter_id'];
+
+        if (count($sheltertoupdate) > 0) {
+            // if ($shelteridString[0]['shelter_address'] == null) {
+            //     $sheltertoupdate[0]->shelter_address = $newShelterinfo['shelter_address'];
+            //     $sheltertoupdate[0]->shelter_address_city = $newShelterinfo['shelter_address_city'];
+            //     $sheltertoupdate[0]->shelter_address_state = $newShelterinfo['shelter_address_state'];
+            //     $sheltertoupdate[0]->shelter_address_zip = $newShelterinfo['shelter_address_zip'];
+            //     $sheltertoupdate[0]->shelter_county = $newShelterinfo['shelter_county'];
+            //     $sheltertoupdate[0]->shelter_phone = $newShelterinfo['shelter_phone'];
+            //     $sheltertoupdate[0]->shelter_EIN = $newShelterinfo['shelter_EIN'];
+                $sheltertoupdate[0]->shelter_approved = $newShelterinfo['shelter_approved'];
+
+                $sheltertoupdate[0]->save();
+            // }
+        
+         return $sheltertoupdate[0];
+            } else{
+
+                $message = "Nothing to update";
+                return $message;
+            }
+    }
+
 
 
     /**
