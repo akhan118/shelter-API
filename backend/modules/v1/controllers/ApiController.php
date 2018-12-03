@@ -97,6 +97,7 @@ class ApiController extends Controller
             return ['Authentication' => false];
         }    }
 
+
     /**
      * Action Signup
      * This function will add the initial location information for Shelters-
@@ -269,15 +270,16 @@ class ApiController extends Controller
 
 
 
-        /**
-         * Action ShelterConfig
-         * This function will add the initial information for types of rooms-
-         * available for the shelter when they first register their shelter
-         * Author: Annette
-         * paramters: ..........?
-         * return : ...........?
-         * @return string
-         */
+    /**
+     * Action ShelterConfig
+     * This function will add the initial information for types of rooms-
+     * available for the shelter when they first register their shelter
+     * Author: Annette
+     * paramters: shelter_id, shelter_address, shelter_address_city, shelter_address_state, shelter_address_zip, 
+     *       shelter_phone, shelter_EIN, shelter_county
+     * return : shelter information added and message - $sheltertoupdate[0]
+     * @return string
+     */
         public function actionShelterconfig()
         {
             $request = Yii::$app->request;
@@ -376,12 +378,14 @@ class ApiController extends Controller
         }
         }
 
-
-
-
-
-
-
+    /**
+     * Action Shelterupdateconfig
+     * This function will add the updated information for types of rooms available for the shelter 
+     * Author: Annette
+     * paramters: shelter_id, women, men, youth, family and if available
+     * return : shelter information added and message - $sheltertoupdate[0]
+     * @return string
+     */
 
 //  This function is to update the availability of the shelters
  public function actionShelterupdateconfig()
@@ -494,6 +498,15 @@ class ApiController extends Controller
  }
 
 
+    /**
+     * Action Getallsheltersneedactivation
+     * This function will show all the shelters in the database to the SuperUser
+     * Author: Annette
+     * paramters: shelter_id, women, men, youth, family and if available
+     * return : shelters in database or message if empty
+     * @return string
+     */
+
     public function actionGetallsheltersneedactivation()
     {
         $response = (new \yii\db\Query())
@@ -516,68 +529,69 @@ class ApiController extends Controller
     }
 
 
-
-
-
-
-
-
+    /**
+     * Action Getrequestedinfov2
+     * This function will available shelters in the database to the Users searching for shelter.  
+     * Author: Annette
+     * paramters: Type of shelter searching (Women, Men, Youth or Family)for or 5 for all shelters
+     * return : List of shelter matching search type
+     * @return string
+     */
 
     public function actionGetrequestedinfov2()
     {
 
         //get shelter type (decide if it is a string or in )
         $requestedShelterType = Yii::$app->request->get();
-$k=0;
+        $k=0;
         
             //grab all shelters that match the query type
-            $response2 = (new \yii\db\Query())
-                ->select([
-                    'shelter_id', 'shelter_name', 'shelter_address',
-                    'shelter_address_city', 'shelter_address_state', 'shelter_address_zip',
-                    'shelter_phone', 'shelter_long', 'shelter_lat', 'shelter_county'
-                ])
-                ->from('shelter_table')
-                // ->where(['shelter_id' => $response1[$i]['shelter_id']])
-                ->where(['shelter_approved' => 1])
-                ->all();
-      
+        $response2 = (new \yii\db\Query())
+            ->select([
+                'shelter_id', 'shelter_name', 'shelter_address',
+                'shelter_address_city', 'shelter_address_state', 'shelter_address_zip',
+                'shelter_phone', 'shelter_long', 'shelter_lat', 'shelter_county'
+            ])
+            ->from('shelter_table')
+            // ->where(['shelter_id' => $response1[$i]['shelter_id']])
+            ->where(['shelter_approved' => 1])
+            ->all();
+    
 
-        $returnedArray = [];
+         $returnedArray = [];
 
         // puts all the selected shelter id into an array for json file 
 
-    if ($requestedShelterType['sheltertype'] == 5) {
+        if ($requestedShelterType['sheltertype'] == 5) {
 
 
-        for ($i = 0; $i < count($response2); $i++) {
-           
-          //get desired fields from shelter_table from shelters matching type
-          //request
-      
+            for ($i = 0; $i < count($response2); $i++) {
+            
+            //get desired fields from shelter_table from shelters matching type
+            //request
+        
+                $response1 = (new \yii\db\Query())
+                    ->select('*')
+                    ->from('shelter_detail_table')
+                    ->where(['shelter_id' => $response2[$i]])
+                    ->all();
+                for ($j = 0; $j < 4; $j++) {
+                array_push($returnedArray, $response2[$i]);
+            //add in fields from shelter_detail_table
+                $returnedArray[$k]['shelter_type_id'] = $response1[$j]['shelter_type_id'];
+                $returnedArray[$k]['available'] = $response1[$j]['available'];
+                $returnedArray[$k]['last_updated'] = $response1[$j]['last_updated'];
+                
+                    $k = $k + 1;
+                }
+       
+            }
+         } else {
             $response1 = (new \yii\db\Query())
                 ->select('*')
                 ->from('shelter_detail_table')
-                ->where(['shelter_id' => $response2[$i]])
+                ->where(['shelter_type_id' => $requestedShelterType])
                 ->all();
-            for ($j = 0; $j < 4; $j++) {
-            array_push($returnedArray, $response2[$i]);
-          //add in fields from shelter_detail_table
-            $returnedArray[$k]['shelter_type_id'] = $response1[$j]['shelter_type_id'];
-            $returnedArray[$k]['available'] = $response1[$j]['available'];
-            $returnedArray[$k]['last_updated'] = $response1[$j]['last_updated'];
-            
-                $k = $k + 1;
-        }
-       
-    }
-}
-     else {
-        $response1 = (new \yii\db\Query())
-            ->select('*')
-            ->from('shelter_detail_table')
-            ->where(['shelter_type_id' => $requestedShelterType])
-            ->all();
 
             if (count($response1) > 0) {
 
@@ -598,13 +612,13 @@ $k=0;
                         $returnedArray[$i]['available'] = $response1[$i]['available'];
                         $returnedArray[$i]['last_updated'] = $response1[$i]['last_updated'];
 
-                         }
-        } else {
-            $message = "No Available to that type" & $requestedShelterType['sheltertype'];
-            return $message;
+                   }
+            } else {
+                 $message = "No Available to that type" & $requestedShelterType['sheltertype'];
+                  return $message;
 
-        }
-    }
+               }
+           }
 
 
     return $returnedArray;
