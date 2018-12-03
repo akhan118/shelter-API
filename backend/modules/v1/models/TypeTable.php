@@ -43,7 +43,7 @@ class TypeTable extends \yii\db\ActiveRecord
             'type_name' => 'Type Name',
         ];
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */

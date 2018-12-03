@@ -55,56 +55,76 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2', 'signupshelter', 'shelterconfig', 'shelterupdateconfig']
+        'except'=>['login','signup','getrequestedinfo','getrequestedinfov2', 'getallsheltersneedactivation','signupshelter', 'shelterconfig', 'shelterupdateconfig']
         ];
 
         return $behaviors;
     }
 
-
+    /**
+     * Action Login
+     * This function will log Shelter Admin into app so they can work with the Shelter they are attached to-
+     *
+     * Author: Ahmad
+     * paramters: username, password, userId
+     * return : access token, username, role, and shelter associated with userId
+     * @return string
+     */
 
     public function actionLogin()
     {
         $model = new LoginForm();
         $request = Yii::$app->request;
         $get = $request->get();
-        $model->attributes =Yii::$app->request->get();
+        $newLogininfo = Yii::$app->request->get();
+        $model->attributes = Yii::$app->request->get();
         if ($model->validate() && $model->login()) {
-            $userId= Yii::$app->user->identity->id;
-
-
+            $userId = Yii::$app->user->identity->id;
             $shelter = (new \yii\db\Query())
-                            ->select('*')
-                            ->from('shelter_table')
-                            ->where(['userId' => $userId])
-                            ->all();
-                            var_dump($shelter);
-            //
-            // return ['access_token' => Yii::$app->user->identity->getAuthKey(),
-            //         'username' => Yii::$app->user->identity->username,
-            //         'role' => \Yii::$app->authManager->getRolesByUser($userId),
-            //         'shelter'=> $shelter,
-            //       ];
+                ->select('*')
+                ->from('shelter_table')
+                ->where(['userId' => $userId])
+                ->all();
+
+
+            return [
+                'access_token' => Yii::$app->user->identity->getAuthKey(),
+                'username' => Yii::$app->user->identity->username,
+                'role' => \Yii::$app->authManager->getRolesByUser($userId),
+                'shelter' => $shelter,
+            ];
         } else {
             return ['Authentication' => false];
-        }
-    }
+        }    }
 
-
+    /**
+     * Action Signup
+     * This function will add the initial location information for Shelters-
+     *
+     * Author: Ahmad
+     * paramters: shelter_name, email, username, and password
+     *            
+     * return : if signup = send true and userId, or false and error message 
+     * @return string
+     */
+    
     public function actionSignup()
     {
         $model = new SignupForm();
         $request = Yii::$app->request;
-
         $get = $request->get();
-        // var_dump($get);
+
         $model->attributes = Yii::$app->request->get();
+
+
         if ($model->validate() && $model->signup()) {
-            return ['signup' => true,
-                    'userId' => Yii::$app->db->getLastInsertID(),
-                    ];
+            return [
+                'signup' => true,
+                'userId' => Yii::$app->db->getLastInsertID(),
+
+            ];
         } else {
-            return ['signup' => false,'error'=>$model->getErrors()];
+            return ['signup' => false, 'error' => $model->getErrors()];
         }
     }
 
@@ -228,18 +248,18 @@ class ApiController extends Controller
                 'userID' => $userId,
 
             ])->execute();
-                return   $response = [
+                return $response = [
                 'status' => 'success',
                 'new_shelter_id' => Yii::$app->db->getLastInsertID(),
             ];
             } else {
-                return       $response = [
+                return $response = [
                'signup' =>'failed',
                'error' => $signup['error']
            ];
             }
         } else {
-            return     $response = [
+            return $response = [
               'incomplete input ' =>'failed',
               'error' => $newShelterinfo,
           ];
@@ -474,6 +494,32 @@ class ApiController extends Controller
  }
 
 
+    public function actionGetallsheltersneedactivation()
+    {
+        $response = (new \yii\db\Query())
+            ->select('*')
+            ->from('shelter_table')
+    //   ->where(['shelter_approved' => $shelter_approved]) // super admin can check by approve number 1 not 2 approved
+            ->all();
+        if (count($response) > 0) {
+
+            $message = ['Shelters in database ', $response];
+            return $message;
+
+        } else {
+
+            $message = ['No shelters in database'];
+            return $message;
+
+            return $response;
+        }
+    }
+
+
+
+
+
+
 
 
 
@@ -482,34 +528,9 @@ class ApiController extends Controller
 
         //get shelter type (decide if it is a string or in )
         $requestedShelterType = Yii::$app->request->get();
-
-        if ($requestedShelterType['sheltertype'] == 5) {
+$k=0;
+        
             //grab all shelters that match the query type
-            $response1 = (new \yii\db\Query())
-                ->select('*')
-                ->from('shelter_detail_table')
-                ->all();
-        } else {
-            $response1 = (new \yii\db\Query())
-                ->select('*')
-                ->from('shelter_detail_table')
-                ->where(['shelter_type_id' => $requestedShelterType])
-                ->all();
-        }
-
-        $sheltertypeString = (new \yii\db\Query())
-            ->select('*')
-            ->from('type_table')
-            ->where(['shelter_type_id' => intval($requestedShelterType['sheltertype'])])
-            ->all();
-
-        $returnedArray = [];
-
-        // puts all the selected shelter id into an array for json file format
-        for ($i = 0; $i < count($response1); $i++) {
-
-          //get desired fields from shelter_table from shelters matching type
-          //request
             $response2 = (new \yii\db\Query())
                 ->select([
                     'shelter_id', 'shelter_name', 'shelter_address',
@@ -517,18 +538,75 @@ class ApiController extends Controller
                     'shelter_phone', 'shelter_long', 'shelter_lat', 'shelter_county'
                 ])
                 ->from('shelter_table')
-                ->where(['shelter_id' => $response1[$i]['shelter_id']])
+                // ->where(['shelter_id' => $response1[$i]['shelter_id']])
+                ->where(['shelter_approved' => 1])
                 ->all();
+      
 
-            array_push($returnedArray, $response2[0]);
+        $returnedArray = [];
+
+        // puts all the selected shelter id into an array for json file 
+
+    if ($requestedShelterType['sheltertype'] == 5) {
+
+
+        for ($i = 0; $i < count($response2); $i++) {
+           
+          //get desired fields from shelter_table from shelters matching type
+          //request
+      
+            $response1 = (new \yii\db\Query())
+                ->select('*')
+                ->from('shelter_detail_table')
+                ->where(['shelter_id' => $response2[$i]])
+                ->all();
+            for ($j = 0; $j < 4; $j++) {
+            array_push($returnedArray, $response2[$i]);
           //add in fields from shelter_detail_table
-            $returnedArray[$i]['shelter_type'] = [
-                "id" => $requestedShelterType['sheltertype'],
-                "type" => $sheltertypeString[0]['type_name']
-            ];
-            $returnedArray[$i]['available'] = $response1[$i]['available'];
-            $returnedArray[$i]['last_updated'] = $response1[$i]['last_updated'];
+            $returnedArray[$k]['shelter_type_id'] = $response1[$j]['shelter_type_id'];
+            $returnedArray[$k]['available'] = $response1[$j]['available'];
+            $returnedArray[$k]['last_updated'] = $response1[$j]['last_updated'];
+            
+                $k = $k + 1;
         }
-        return $returnedArray;
+       
     }
+}
+     else {
+        $response1 = (new \yii\db\Query())
+            ->select('*')
+            ->from('shelter_detail_table')
+            ->where(['shelter_type_id' => $requestedShelterType])
+            ->all();
+
+            if (count($response1) > 0) {
+
+                 for ($i = 0; $i < count($response1); $i++) {
+                      $response2 = (new \yii\db\Query())
+                      ->select([
+                            'shelter_id', 'shelter_name', 'shelter_address',
+                            'shelter_address_city', 'shelter_address_state', 'shelter_address_zip',
+                            'shelter_phone', 'shelter_long', 'shelter_lat', 'shelter_county'
+                             ])
+                        ->from('shelter_table')
+                            // ->where(['shelter_id' => $response1[$i]['shelter_id']])
+                        ->where(['shelter_approved' => 1] and ['shelter_id' => $response1[$i]['shelter_id']] )
+                        ->all();
+
+                        array_push($returnedArray, $response2[$i]);
+                        $returnedArray[$i]['shelter_type_id'] = $response1[$i]['shelter_type_id'];
+                        $returnedArray[$i]['available'] = $response1[$i]['available'];
+                        $returnedArray[$i]['last_updated'] = $response1[$i]['last_updated'];
+
+                         }
+        } else {
+            $message = "No Available to that type" & $requestedShelterType['sheltertype'];
+            return $message;
+
+        }
+    }
+
+
+    return $returnedArray;
+}
 }
