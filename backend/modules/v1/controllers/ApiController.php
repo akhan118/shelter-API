@@ -83,7 +83,7 @@ class ApiController extends Controller
             $shelter = (new \yii\db\Query())
                 ->select('*')
                 ->from('shelter_table')
-                ->where(['userId' => $userId])
+                ->where(['userId' => $newLogininfo['userId']])
                 ->all();
 
 
@@ -116,9 +116,11 @@ class ApiController extends Controller
         $get = $request->get();
 
         $model->attributes = Yii::$app->request->get();
-
+// var_dump(Yii::$app->db->getLastInsertID());
 
         if ($model->validate() && $model->signup()) {
+            
+
             return [
                 'signup' => true,
                 'userId' => Yii::$app->db->getLastInsertID(),
@@ -235,18 +237,30 @@ class ApiController extends Controller
             && isset($newShelterinfo['username'])) {
             $signup= $this->actionSignup();
 
+
+
             if ($signup['signup'] != false) {
                 $userId= $signup['userId'];
+
+                $useridString = (new \yii\db\Query())
+                    ->select('*')
+                    ->from('user')
+                    ->where(['username' => $newShelterinfo['username']])
+                    ->all();
+
+//  var_dump($useridString);
+                $userId = $useridString[0]['id'];
+ 
                 Yii::$app->db->createCommand()->insert('shelter_table', [
                 'shelter_name' => $newShelterinfo['shelter_name'],
                 'shelter_email' => $newShelterinfo['email'],
                 'username' => $newShelterinfo['username'],
                 'userID' => $userId,
-
             ])->execute();
                 return $response = [
                 'status' => 'success',
                 'new_shelter_id' => Yii::$app->db->getLastInsertID(),
+                'userID'=> $userId,
             ];
             } else {
                 return $response = [
@@ -596,7 +610,10 @@ class ApiController extends Controller
             ->where(['shelter_approved' => 1])
             ->all();
 // var_Dump($response2);
-
+if (count($response2)<1){
+    $message="No shelters to display.  Need to be approved";
+    return $message;
+}
          $returnedArray = [];
 
         // puts all the selected shelter id into an array for json file 
