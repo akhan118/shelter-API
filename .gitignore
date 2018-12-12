@@ -25,3 +25,7 @@ phpunit.phar
  # vagrant runtime
 /.vagrant
 /frontend/web/
+
+frontend/web/index.html
+
+frontend/web/index.html
