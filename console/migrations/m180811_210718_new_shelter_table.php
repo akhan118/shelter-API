@@ -20,7 +20,7 @@ class m180811_210718_new_shelter_table extends Migration
 
         $this->createTable('{{%shelter_table}}', [
             'shelter_id' => $this->primaryKey(),
-            'shelter_name' => $this->string(10)->notNull(),
+            'shelter_name' => $this->string(30)->notNull(),
             'shelter_address' => $this->string(30)->notNull(),
             'shelter_address_city' => $this->string(30)->notNull(),
             'shelter_address_state' => $this->string(30)->notNull(),
@@ -29,8 +29,8 @@ class m180811_210718_new_shelter_table extends Migration
             'shelter_phone' => $this->integer()->notNull(),
             'shelter_email' => $this->string(10)->notNull(),
             'shelter_EIN' => $this->integer()->notNull(),
-            'shelter_long' => $this->integer()->notNull(),
-            'shelter_lat' => $this->integer()->notNull(),
+            'shelter_long' => $this->integer(),
+            'shelter_lat' => $this->integer(),
             'username' => $this->string(30)->notNull(),
             'shelter_approved' => $this->smallInteger()->notNull()->defaultValue(0),
 

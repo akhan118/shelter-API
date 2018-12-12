@@ -38,7 +38,7 @@ class ShelterDetailTable extends \yii\db\ActiveRecord
             [['shelter_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShelterTable::className(), 'targetAttribute' => ['shelter_id' => 'shelter_id']],
             [['shelter_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => TypeTable::className(), 'targetAttribute' => ['shelter_type_id' => 'shelter_type_id']],
         ];
-       
+
 
     }
 
@@ -71,7 +71,7 @@ class ShelterDetailTable extends \yii\db\ActiveRecord
     {
         return $this->hasOne(TypeTable::className(), ['shelter_type_id' => 'shelter_type_id']);
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */

@@ -39,9 +39,9 @@ class ShelterTable extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['shelter_name', 'shelter_address', 'shelter_address_city', 'shelter_address_state', 'shelter_address_zip', 'shelter_phone', 'shelter_long', 'shelter_lat', 'shelter_county', 'shelter_email', 'shelter_EIN'], 'required'],
+            [['shelter_name', 'shelter_address', 'shelter_address_city', 'shelter_address_state', 'shelter_address_zip', 'shelter_phone', 'shelter_county', 'shelter_email', 'shelter_EIN'], 'required'],
             [['shelter_phone', 'shelter_long', 'shelter_lat', 'shelter_EIN', 'shelter_approved'], 'integer'],
-            [['shelter_name', 'shelter_county', 'shelter_email'], 'string', 'max' => 10],
+            [['shelter_name', 'shelter_county', 'shelter_email'], 'string', 'max' => 30],
             [['shelter_address', 'shelter_address_city', 'shelter_address_state', 'shelter_address_zip'], 'string', 'max' => 30],
         ];
     }
