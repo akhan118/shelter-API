@@ -81,10 +81,13 @@ class ApiController extends Controller
         $model->attributes = Yii::$app->request->get();
         if ($model->validate() && $model->login()) {
             $userId = Yii::$app->user->identity->id;
+
+
             $shelter = (new \yii\db\Query())
                 ->select('*')
                 ->from('shelter_table')
-                ->where(['userId' => $newLogininfo['userId']])
+                // ->where(['userId' => $newLogininfo['userId']])
+                ->where(['userId' => $userId])
                 ->all();
 
 
