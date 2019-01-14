@@ -55,7 +55,7 @@ class ApiController extends Controller
         $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
         'class' => HttpBearerAuth::className(),
-     'except' => ['login', 'signup', 'getrequestedinfo', 'getrequestedinfov2', 'signupshelter', 'shelterconfig', 'shelterupdateconfig', 'updateshelterapprovalview', 'updateshelterapprovalupdate', 'getallsheltersneedactivation']
+     'except' => ['login', 'signup', 'getrequestedinfo', 'getrequestedinfov2', 'getallsheltersneedactivation', 'signupshelter', 'shelterconfig', 'shelterupdateconfig', 'updateshelterapprovalview', 'updateshelterapprovalupdate']
         ];
 
         return $behaviors;
@@ -81,6 +81,8 @@ class ApiController extends Controller
         $model->attributes = Yii::$app->request->get();
         if ($model->validate() && $model->login()) {
             $userId = Yii::$app->user->identity->id;
+
+
             $shelter = (new \yii\db\Query())
                 ->select('*')
                 ->from('shelter_table')
@@ -287,11 +289,6 @@ class ApiController extends Controller
         }
     }
 
-
-
-
-
-
     /**
      * Action ShelterConfig
      * This function will add the initial location information for Shelters-
@@ -337,7 +334,7 @@ class ApiController extends Controller
             $shelteridString = (new \yii\db\Query())
                 ->select('*')
                 ->from('shelter_table')
-                ->where(['shelter_id' => $newShelterinfo['shelter_id']])
+                ->where(['shelter_id' => $newShelterinfo['shelter_id']] and ['shelter_approved' => 1])
                 ->all();
 
 
@@ -435,11 +432,20 @@ class ApiController extends Controller
             $sheltertableString = (new \yii\db\Query())
                 ->select('*')
                 ->from('shelter_table')
-                ->where(['shelter_id' => $newShelteravailable['shelter_id']])
-                ->all();
-            // var_dump($sheltertableString);
+                 ->where(['shelter_id' => $newShelteravailable['shelter_id']])
+                 ->all();
+           var_dump($sheltertableString[0]['shelter_approved']);
+           var_dump($sheltertableString);
+          
+          if ($sheltertableString[0]['shelter_approved'] = 0){
 
-            if (count($sheltertableString) > 0) {
+            $message = "This shelter is not approved for updating";
+            return $message;
+          }
+          
+                var_dump($sheltertableString);
+
+            if (count($sheltertableString) > 0 and $sheltertableString[0]['shelter_approved'] = 1) {
                 $sheltertypeString = (new \yii\db\Query())
                     ->select('*')
                     ->from('shelter_detail_table')
@@ -487,7 +493,7 @@ class ApiController extends Controller
                         'last_updated' => $date,
                     ])->execute();
 
-                    $message = ['Availability has been added', newShelteravailable];
+                    $message = ['Availability has been added', $newShelteravailable];
                     return $message;
                 } else {
 
@@ -586,91 +592,6 @@ class ApiController extends Controller
         $request = Yii::$app->request;
         $get = $request->get();
         $newShelterinfo = Yii::$app->request->get();
-        // var_dump($newShelterinfo);
-        date_default_timezone_set('america/detroit');
-        $date = date('Y-m-d h:i:s a', time());
-
-        $shelteridString = ShelterTable::findAll(['shelter_id' => $newShelterinfo['shelter_id']]);
-
-        if (count($shelteridString) > 0) {
-        $newShelterinfoshelter_address = $shelteridString[0]->shelter_address;
-        $newShelterinfoshelter_address_city= $shelteridString[0]->shelter_address_city;
-        $newShelterinfoshelter_address_state =$shelteridString[0]->shelter_address_state;
-        $newShelterinfoshelter_address_zip =$shelteridString[0]->shelter_address_zip;
-        $newShelterinfoshelter_county =$shelteridString[0]->shelter_county;
-        $newShelterinfoshelter_phone = $shelteridString[0]->shelter_phone;
-        $newShelterinfoshelter_EIN = $shelteridString[0]->shelter_EIN ;
-
-            // shelter exists in shelter_table
-
-            var_dump($shelteridString);
-            var_dump($newShelterinfo['shelter_approved']);
-            $shelteridString[0]->shelter_address = $newShelterinfoshelter_address;
-            $shelteridString[0]->shelter_address_city = $newShelterinfoshelter_address_city;
-            $shelteridString[0]->shelter_address_state = $newShelterinfoshelter_address_state;
-            $shelteridString[0]->shelter_address_zip = $newShelterinfoshelter_address_zip;
-            $shelteridString[0]->shelter_county = $newShelterinfoshelter_county;
-            $shelteridString[0]->shelter_phone = $newShelterinfoshelter_phone;
-            $shelteridString[0]->shelter_EIN = $newShelterinfoshelter_EIN;
-            $shelteridString[0]->shelter_approved = $newShelterinfo['shelter_approved'];
-            $shelteridString[0]->save();
-
-
-
-            $shelteridString = (new \yii\db\Query())
-                ->select('*')
-                ->from('shelter_table')
-                ->where(['shelter_id' => $newShelterinfo['shelter_id']])
-                ->all();
-
-
-    /**
-     * Action Getallsheltersneedactivation
-     * This function will show all the shelters in the database to the SuperUser
-     * Author: Annette
-     * paramters: shelter_id, women, men, youth, family and if available
-     * return : shelters in database or message if empty
-     * @return string
-     */
-
-    public function actionGetallsheltersneedactivation()
-    {
-        $response = (new \yii\db\Query())
-            ->select('*')
-            ->from('shelter_table')
-    //   ->where(['shelter_approved' => $shelter_approved]) // super admin can check by approve number 1 not 2 approved
-            ->all();
-        if (count($response) > 0) {
-
-            $message = ['Shelters in database ', $response];
-            return $message;
-
-        } else {
-
-
-            $message = ['No shelters in database'];
-            return $message;
-
-            return $response;
-        }
-    }
-
-
-    /**
-     * Action Updateshelterapprovalupdate
-     * This function will available shelters in the database to the Users searching for shelter.
-     * Author: Annette
-     * paramters: Type of shelter searching (Women, Men, Youth or Family)for or 5 for all shelters
-     * return : List of shelter matching search type
-     * @return string
-     */
-
-    public function actionUpdateshelterapprovalupdate(){
-
-
-        $request = Yii::$app->request;
-        $get = $request->get();
-        $newShelterinfo = Yii::$app->request->get();
 
         $sheltertoupdate = ShelterTable::findAll(['shelter_id' => $newShelterinfo['shelter_id']]);
 
@@ -685,19 +606,15 @@ class ApiController extends Controller
             //     $sheltertoupdate[0]->shelter_county = $newShelterinfo['shelter_county'];
             //     $sheltertoupdate[0]->shelter_phone = $newShelterinfo['shelter_phone'];
             //     $sheltertoupdate[0]->shelter_EIN = $newShelterinfo['shelter_EIN'];
-                $sheltertoupdate[0]->shelter_approved = $newShelterinfo['shelter_approved'];
+            $sheltertoupdate[0]->shelter_approved = $newShelterinfo['shelter_approved'];
 
-                $sheltertoupdate[0]->save();
-            // }
-
-         return $sheltertoupdate[0];
-            } else{
-
-                $message = "Nothing to update";
-                return $message;
-            }
+            $sheltertoupdate[0]->save();
+            return $sheltertoupdate[0];
+        } else {
+            $message = "Nothing to update";
+            return $message;
+        }
     }
-
 
 
     /**
@@ -729,7 +646,7 @@ class ApiController extends Controller
             ->all();
 // var_Dump($response2);
 if (count($response2)<1){
-    $message="No shelters to display.  Need to be approved";
+    $message="No shelters to display. Need to be approved";
     return $message;
 }
          $returnedArray = [];
